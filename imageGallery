@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Glass Gallery Albums</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #89f7fe, #66a6ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 30px;
+      box-sizing: border-box;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .card {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .caption {
+      padding: 15px;
+      color: white;
+      font-size: 1rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+      animation: fadeIn 0.3s ease;
+      position: relative;
+    }
+
+    .modal-content img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .controls {
+      margin-top: 15px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      z-index: 2000;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="gallery">
+    <div class="card" onclick="openAlbum('mountain')">
+      <img src="https://picsum.photos/id/1011/400/300" alt="Mountain" />
+      <div class="caption">Mountain View</div>
+    </div>
+    <div class="card" onclick="openAlbum('forest')">
+      <img src="https://picsum.photos/id/1015/400/300" alt="Forest" />
+      <div class="caption">Forest River</div>
+    </div>
+    <div class="card" onclick="openAlbum('dog')">
+      <img src="https://picsum.photos/id/1025/400/300" alt="Dog" />
+      <div class="caption">Golden Retriever</div>
+    </div>
+    <div class="card" onclick="openAlbum('beach')">
+      <img src="https://picsum.photos/id/1043/400/300" alt="Beach" />
+      <div class="caption">Beach Vibes</div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="imageModal">
+    <div class="close" onclick="closeModal()">×</div>
+    <div class="modal-content">
+      <img id="modalImage" src="" alt="Large View" />
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="prevImage()">⟨ Prev</button>
+      <button class="btn" onclick="nextImage()">Next ⟩</button>
+    </div>
+  </div>
+
+  <script>
+    const albums = {
+      mountain: [
+        'https://picsum.photos/id/1011/800/600',
+        'https://picsum.photos/id/1002/800/600',
+        'https://picsum.photos/id/1003/800/600'
+      ],
+      forest: [
+        'https://picsum.photos/id/1015/800/600',
+        'https://picsum.photos/id/1016/800/600',
+        'https://picsum.photos/id/1018/800/600'
+      ],
+      dog: [
+        'https://picsum.photos/id/1025/800/600',
+        'https://picsum.photos/id/1024/800/600',
+        'https://picsum.photos/id/1022/800/600'
+      ],
+      beach: [
+        'https://picsum.photos/id/1043/800/600',
+        'https://picsum.photos/id/1056/800/600',
+        'https://picsum.photos/id/1057/800/600'
+      ]
+    };
+
+    let currentAlbum = [];
+    let currentIndex = 0;
+
+    function openAlbum(name) {
+      currentAlbum = albums[name];
+      currentIndex = 0;
+      document.getElementById('modalImage').src = currentAlbum[currentIndex];
+      document.getElementById('imageModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('imageModal').style.display = 'none';
+    }
+
+    function nextImage() {
+      if (currentIndex < currentAlbum.length - 1) {
+        currentIndex++;
+      } else {
+        currentIndex = 0;
+      }
+      document.getElementById('modalImage').src = currentAlbum[currentIndex];
+    }
+
+    function prevImage() {
+      if (currentIndex > 0) {
+        currentIndex--;
+      } else {
+        currentIndex = currentAlbum.length - 1;
+      }
+      document.getElementById('modalImage').src = currentAlbum[currentIndex];
+    }
+
+    // Optional: close modal when background is clicked
+    document.getElementById('imageModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
